@@ -16,28 +16,18 @@ class VisGraph:
         self.m = len(graph.edges)
 
     @staticmethod
-    def is_visible(polygon: Poly, v1, v2):
+    def is_visible(polygon: Poly, i, j):
+        v1, v2 = polygon.poly.exterior.coords[i], polygon.poly.exterior.coords[j]
         if v1 == v2:
             return False
+        return polygon.poly.buffer(1e-9).contains(LineString([v1, v2]))
 
-        l = LineString([v1, v2])
-        if not polygon.poly.contains(l):
-            return False
-
-        for edge in zip(
-            polygon.poly.exterior.coords[:-1], polygon.poly.exterior.coords[1:]
-        ):
-            if l.intersects(LineString(edge)):
-                return False
-
-        if l.intersects(
-            LineString(
-                [polygon.poly.exterior.coords[-1], polygon.poly.exterior.coords[0]]
-            )
-        ):
-            return False
-
-        return True
+    def get_edge_orders(self):
+        return sorted(
+            [(k, v) for k, v in dict(self.graph.degree()).items()],
+            key=lambda x: x[1],
+            reverse=True,
+        )
 
     def plot(self):
         pos = nx.get_node_attributes(self.graph, "pos")
@@ -55,9 +45,9 @@ class VisGraph:
         for i, v in enumerate(vertices):
             g.add_node(i, pos=v)
             for j in range(i + 1, len(vertices)):
-                if i == (j + 1) % len(vertices):
+                if j == (i + 1) % len(vertices) or (i == 0 and j == len(vertices) - 1):
                     g.add_edge(i, j)
-                elif VisGraph.is_visible(polygon, vertices[i], vertices[j]):
+                elif VisGraph.is_visible(polygon, i, j):
                     g.add_edge(i, j)
 
         return VisGraph(g)
