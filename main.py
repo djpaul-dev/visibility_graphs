@@ -32,12 +32,18 @@ def plot(polygon: Poly, graph: VisGraph):
 
 
 if __name__ == "__main__":
-    iters = 100
+    iters = 10000
     for i in range(iters):
-        p = Poly.random(10)
+        if i % 1000 == 0:
+            print(i)
+        p = Poly.random(7)
         vg = VisGraph.from_poly(p)
-        print([x[1] for x in vg.get_edge_orders()])
-    plot(p, vg)
+        lst = [x[1] for x in vg.get_edge_orders()]
+        if lst == [6, 5, 3, 3, 3, 3, 3]:
+            print("found")
+            print(lst)
+            plot(p, vg)
+            break
 
     # plot(p, vg)
     # vg.plot()
