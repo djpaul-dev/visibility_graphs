@@ -81,7 +81,7 @@ class VisGraph:
 
             # closest vertex to fulfillment
             valid_edges_lst = list(valid_edges)
-            edge_scores = [min(vis_diff[i], vis_diff[j]) for i, j in valid_edges_lst if vis_diff[i] != 0 and vis_diff[j] != 0 else float("inf")]
+            edge_scores = [min(vis_diff[i], vis_diff[j]) if vis_diff[i] != 0 and vis_diff[j] != 0 else float("inf") for i, j in valid_edges_lst ]
             for e in valid_edges_lst[np.argsort(edge_scores)]: 
                 # find point to place new vertex
                 new_pt = [0, 0] # TODO
